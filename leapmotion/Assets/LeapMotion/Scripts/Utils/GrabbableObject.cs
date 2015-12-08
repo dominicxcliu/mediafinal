@@ -20,9 +20,39 @@ public class GrabbableObject : MonoBehaviour {
   public float breakForce;
   public float breakTorque;
 
+	private FixedJoint joint;
+	private AudioSource sound;
+	public GameObject board;
+
   protected bool grabbed_ = false;
   protected bool hovered_ = false;
 
+	private Vector3 pos;
+	private float xMin;
+	private float xMax;
+	private float yMin;
+	private float yMax;
+	private float xRatio;
+	private float yRatio;
+	private float octaves = 1f;
+	private bool playedForBar;
+	//length of a measure in seconds
+	//assume 4/4 time for now
+	private float barLength = 2f;
+	private float elapsed;
+	private Color pink;
+	private Color green;
+
+	void Start() {
+		sound = this.gameObject.GetComponent <AudioSource> ();
+		xMin = board.transform.position.x - board.transform.lossyScale.x * 5f;
+		xMax = board.transform.position.x + board.transform.lossyScale.x * 5f;
+		yMin = board.transform.position.y - board.transform.lossyScale.z * 5f;
+		yMax = board.transform.position.y + board.transform.lossyScale.z * 5f;
+		elapsed = 0f;
+		pink = new Color (1f, 0.5f, 0.5f);
+		green = new Color (0.5f, 1f, 0.5f);
+	}
   public bool IsHovered() {
     return hovered_;
   }
@@ -68,9 +98,53 @@ public class GrabbableObject : MonoBehaviour {
   }
   void OnCollisionEnter(Collision collision) {
 		if (collision.collider.gameObject.tag == "board") {
-			FixedJoint joint = this.gameObject.AddComponent <FixedJoint> ();
-			joint.breakForce = 500f;
-			joint.connectedBody = collision.rigidbody;
+			FixedJoint tempJ = this.gameObject.AddComponent <FixedJoint> ();
+			tempJ.breakForce = 500f;
+			tempJ.connectedBody = collision.rigidbody;
+			//board = collision.gameObject;
+
+			pos = transform.position;
+			xRatio = Mathf.Abs ((pos.x - xMin) / (board.transform.lossyScale.x * 10f));
+			Debug.Log (pos.x);
+			Debug.Log (xMin);
+			Debug.Log ("XRATIO: " + xRatio);
+			yRatio = Mathf.Abs ((pos.y - yMin) / (board.transform.lossyScale.z * 10f));
+			Debug.Log ("YRATIO: " + yRatio);
+			float aPitch = Mathf.Pow (2f, yRatio * octaves);
+			sound.pitch = aPitch;
+			float barRatio = elapsed / barLength;
+			if(barRatio > xRatio) {
+				playedForBar = true;
+			}
+			else {
+				playedForBar = false;
+			}
+			playedForBar = false;
+			joint = this.gameObject.GetComponent <FixedJoint> ();
+		}
+	}
+
+	void Update() {
+		elapsed += Time.deltaTime;
+
+		if (elapsed > barLength) {
+			elapsed = 0f;
+			playedForBar = false;
+		}
+		if (joint != null && !playedForBar) {
+			//Debug.Log ("1stchecksatisfied");
+			float barRatio = elapsed / barLength;
+			if(barRatio > xRatio) {
+				sound.Play ();
+				Debug.Log ("SOUND PLAYED");
+				playedForBar = true;
+			}
+
+		}
+		if (sound.isPlaying) {
+			this.GetComponent<Renderer> ().material.color = pink;
+		} else {
+			this.GetComponent<Renderer> ().material.color = green;
 		}
 	}
 }
