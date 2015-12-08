@@ -22,6 +22,7 @@ public class GrabbableObject : MonoBehaviour {
 
 	private FixedJoint joint;
 	private AudioSource sound;
+	private AudioSource pickup;
 	public GameObject board;
 
   protected bool grabbed_ = false;
@@ -44,14 +45,17 @@ public class GrabbableObject : MonoBehaviour {
 	private Color green;
 
 	void Start() {
-		sound = this.gameObject.GetComponent <AudioSource> ();
+		AudioSource [] sources = this.gameObject.GetComponents <AudioSource> ();
+//		sound = this.gameObject.GetComponent <AudioSource> ();
+		sound = sources [0];
+		pickup = sources [1];
 		xMin = board.transform.position.x - board.transform.lossyScale.x * 5f;
 		xMax = board.transform.position.x + board.transform.lossyScale.x * 5f;
 		yMin = board.transform.position.y - board.transform.lossyScale.z * 5f;
 		yMax = board.transform.position.y + board.transform.lossyScale.z * 5f;
 		elapsed = 0f;
-		pink = new Color (1f, 0.5f, 0.5f);
-		green = new Color (0.5f, 1f, 0.5f);
+		pink = new Color (1f, 0.7f, 0.7f);
+		green = new Color (0.7f, 1f, 0.7f);
 	}
   public bool IsHovered() {
     return hovered_;
@@ -80,6 +84,7 @@ public class GrabbableObject : MonoBehaviour {
         breakJoint.breakTorque = breakTorque;
       }
     }
+		pickup.Play ();
   }
 
   public virtual void OnRelease() {
@@ -95,9 +100,11 @@ public class GrabbableObject : MonoBehaviour {
 		if (transform.position.z > 0f) {
 			GetComponent <Rigidbody> ().velocity = Vector3.forward * 10f;
 		}
+		pickup.Play ();
   }
   void OnCollisionEnter(Collision collision) {
 		if (collision.collider.gameObject.tag == "board") {
+			//pickup.Play ();
 			FixedJoint tempJ = this.gameObject.AddComponent <FixedJoint> ();
 			tempJ.breakForce = 500f;
 			tempJ.connectedBody = collision.rigidbody;
@@ -105,20 +112,20 @@ public class GrabbableObject : MonoBehaviour {
 
 			pos = transform.position;
 			xRatio = Mathf.Abs ((pos.x - xMin) / (board.transform.lossyScale.x * 10f));
-			Debug.Log (pos.x);
-			Debug.Log (xMin);
-			Debug.Log ("XRATIO: " + xRatio);
+//			Debug.Log (pos.x);
+//			Debug.Log (xMin);
+//			Debug.Log ("XRATIO: " + xRatio);
 			yRatio = Mathf.Abs ((pos.y - yMin) / (board.transform.lossyScale.z * 10f));
-			Debug.Log ("YRATIO: " + yRatio);
+//			Debug.Log ("YRATIO: " + yRatio);
 			float aPitch = Mathf.Pow (2f, yRatio * octaves - 0.2f);
 			sound.pitch = aPitch;
 			float barRatio = elapsed / barLength;
-			if(barRatio > xRatio) {
-				playedForBar = true;
-			}
-			else {
-				playedForBar = false;
-			}
+//			if(barRatio > xRatio) {
+//				playedForBar = true;
+//			}
+//			else {
+//				playedForBar = false;
+//			}
 			playedForBar = false;
 			joint = this.gameObject.GetComponent <FixedJoint> ();
 		}
@@ -134,9 +141,9 @@ public class GrabbableObject : MonoBehaviour {
 		if (joint != null && !playedForBar) {
 			//Debug.Log ("1stchecksatisfied");
 			float barRatio = elapsed / barLength;
-			if(barRatio > xRatio) {
+			if(barRatio > xRatio && !sound.isPlaying) {
 				sound.Play ();
-				Debug.Log ("SOUND PLAYED");
+				Debug.Log ("MOOOOO");
 				playedForBar = true;
 			}
 
