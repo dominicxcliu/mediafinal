@@ -34,11 +34,11 @@ public class GrabbableObject : MonoBehaviour {
 	private float yMax;
 	private float xRatio;
 	private float yRatio;
-	private float octaves = 1f;
+	private float octaves = 1.5f;
 	private bool playedForBar;
 	//length of a measure in seconds
 	//assume 4/4 time for now
-	private float barLength = 2f;
+	private float barLength = 4f;
 	private float elapsed;
 	private Color pink;
 	private Color green;
@@ -110,7 +110,7 @@ public class GrabbableObject : MonoBehaviour {
 			Debug.Log ("XRATIO: " + xRatio);
 			yRatio = Mathf.Abs ((pos.y - yMin) / (board.transform.lossyScale.z * 10f));
 			Debug.Log ("YRATIO: " + yRatio);
-			float aPitch = Mathf.Pow (2f, yRatio * octaves);
+			float aPitch = Mathf.Pow (2f, yRatio * octaves - 0.2f);
 			sound.pitch = aPitch;
 			float barRatio = elapsed / barLength;
 			if(barRatio > xRatio) {
@@ -142,9 +142,9 @@ public class GrabbableObject : MonoBehaviour {
 
 		}
 		if (sound.isPlaying) {
-			this.GetComponent<Renderer> ().material.color = pink;
-		} else {
 			this.GetComponent<Renderer> ().material.color = green;
+		} else {
+			this.GetComponent<Renderer> ().material.color = pink;
 		}
 	}
 }
