@@ -39,7 +39,7 @@ public class GrabbableObject : MonoBehaviour {
 	private bool playedForBar;
 	//length of a measure in seconds
 	//assume 4/4 time for now
-	private float barLength = 4f;
+	private float barLength = 3f;
 	private float elapsed;
 	private Color pink;
 	private Color green;
@@ -106,7 +106,7 @@ public class GrabbableObject : MonoBehaviour {
 		if (collision.collider.gameObject.tag == "board") {
 			//pickup.Play ();
 			FixedJoint tempJ = this.gameObject.AddComponent <FixedJoint> ();
-			tempJ.breakForce = 500f;
+			tempJ.breakForce = 50f;
 			tempJ.connectedBody = collision.rigidbody;
 			//board = collision.gameObject;
 
@@ -132,6 +132,7 @@ public class GrabbableObject : MonoBehaviour {
 	}
 
 	void Update() {
+
 		elapsed += Time.deltaTime;
 
 		if (elapsed > barLength) {
