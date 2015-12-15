@@ -7,7 +7,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class GrabbableObject: MonoBehaviour {
+public class GrabbableObjectOld : MonoBehaviour {
 
   public bool useAxisAlignment = false;
   public Vector3 rightHandAxis;
@@ -44,13 +44,12 @@ public class GrabbableObject: MonoBehaviour {
 	private Color pink;
 	private Color green;
 	public float barRatio;
-	private AudioSource [] sources;
 
 	void Start() {
-		sources = this.gameObject.GetComponents <AudioSource> ();
+		AudioSource [] sources = this.gameObject.GetComponents <AudioSource> ();
 //		sound = this.gameObject.GetComponent <AudioSource> ();
-		pickup = sources [8];
 		sound = sources [0];
+		pickup = sources [1];
 		xMin = board.transform.position.x - board.transform.lossyScale.x * 5f;
 		xMax = board.transform.position.x + board.transform.lossyScale.x * 5f;
 		yMin = board.transform.position.y - board.transform.lossyScale.z * 5f;
@@ -79,6 +78,7 @@ public class GrabbableObject: MonoBehaviour {
   public virtual void OnGrab() {
     grabbed_ = true;
     hovered_ = false;
+
     if (breakableJoint != null) {
       Joint breakJoint = breakableJoint.GetComponent<Joint>();
       if (breakJoint != null) {
@@ -91,6 +91,7 @@ public class GrabbableObject: MonoBehaviour {
 
   public virtual void OnRelease() {
     grabbed_ = false;
+
     if (breakableJoint != null) {
       Joint breakJoint = breakableJoint.GetComponent<Joint>();
       if (breakJoint != null) {
@@ -119,8 +120,8 @@ public class GrabbableObject: MonoBehaviour {
 //			Debug.Log ("XRATIO: " + xRatio);
 			yRatio = Mathf.Abs ((pos.y - yMin) / (board.transform.lossyScale.z * 10f));
 //			Debug.Log ("YRATIO: " + yRatio);
-			int soundNum = (int) (yRatio * 8f);
-			sound = sources [soundNum];
+			float aPitch = Mathf.Pow (2f, yRatio * octaves - 0.2f);
+			sound.pitch = aPitch;
 			float barRatio = elapsed / barLength;
 			if(barRatio > xRatio) {
 				playedForBar = true;
