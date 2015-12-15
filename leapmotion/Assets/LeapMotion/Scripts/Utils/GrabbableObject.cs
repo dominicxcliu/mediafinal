@@ -76,33 +76,35 @@ public class GrabbableObject: MonoBehaviour {
     hovered_ = false;
   }
 
-  public virtual void OnGrab() {
-    grabbed_ = true;
-    hovered_ = false;
-    if (breakableJoint != null) {
-      Joint breakJoint = breakableJoint.GetComponent<Joint>();
-      if (breakJoint != null) {
-        breakJoint.breakForce = breakForce;
-        breakJoint.breakTorque = breakTorque;
-      }
-    }
+	public virtual void OnGrab() {
+		grabbed_ = true;
+		hovered_ = false;
+		
+		if (breakableJoint != null) {
+			Joint breakJoint = breakableJoint.GetComponent<Joint>();
+			if (breakJoint != null) {
+				breakJoint.breakForce = breakForce;
+				breakJoint.breakTorque = breakTorque;
+			}
+		}
 		pickup.Play ();
-  }
+	}
 
-  public virtual void OnRelease() {
-    grabbed_ = false;
-    if (breakableJoint != null) {
-      Joint breakJoint = breakableJoint.GetComponent<Joint>();
-      if (breakJoint != null) {
-        breakJoint.breakForce = Mathf.Infinity;
-        breakJoint.breakTorque = Mathf.Infinity;
-      }
-    }
+	public virtual void OnRelease() {
+		grabbed_ = false;
+		
+		if (breakableJoint != null) {
+			Joint breakJoint = breakableJoint.GetComponent<Joint>();
+			if (breakJoint != null) {
+				breakJoint.breakForce = Mathf.Infinity;
+				breakJoint.breakTorque = Mathf.Infinity;
+			}
+		}
 		if (transform.position.z > 0f) {
 			GetComponent <Rigidbody> ().velocity = Vector3.forward * 10f;
 		}
 		pickup.Play ();
-  }
+	}
 
   void OnCollisionEnter(Collision collision) {
 		if (collision.collider.gameObject.tag == "board") {
